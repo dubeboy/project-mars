@@ -11,7 +11,7 @@ data class Status(
         @Id
         val id: String,
         val body: String,
-        val user: User,
+        var user: User,
         val media: List<Media>? = null,
         val createdAt: Date,
         var comments: List<Comment>,
