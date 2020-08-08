@@ -66,7 +66,7 @@ object KUtils {
                 metaData[HttpHeaders.CONTENT_TYPE] = mime
                 val file = files.first()
                 val createdFile = storeGridFsFile(file, metaData, gridFSOperations)
-                arrayListOf(Media(file.originalFilename ?: file.name, MediaType.PICTURE.ordinal, createdFile.toString()))
+                arrayListOf(Media(file.originalFilename ?: file.name, MediaType.VIDEO.ordinal, createdFile.toString()))
             }
             else -> { // pictures
                 val media: ArrayList<Media> = ArrayList(files.size)
@@ -87,9 +87,10 @@ object KUtils {
             return gridFSOperations.store(file.inputStream, file.originalFilename, file.contentType, metaData)
     }
 
+    // MIGHT not be require my it its needed on android!!
     private fun isFileAVideo(mime: String?): Boolean {
-        return when (mime?.substringAfter("/")) {
-            "mp4", "3gp" ->
+        return when (mime?.substringBefore("/")?.toLowerCase()) {
+            "video" ->
                 true
             else ->
                 false // TODO: Log this error

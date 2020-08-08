@@ -14,4 +14,4 @@ Content-Type: application/json
   "value": "content"
 }
 
-### Send a POST request to update append Media of type form-data
+### Send a POST request to update append Media of type form-data file name file

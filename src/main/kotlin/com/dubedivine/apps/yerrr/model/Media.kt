@@ -13,7 +13,8 @@ data class Media (
     var name: String,
     var type: Int,
     var location: String,
-    val createAt: Date = Date()
+    val createAt: Date = Date(),
+    var isDeleted: Boolean = false
 ) {
     var size: Long? = null
 }

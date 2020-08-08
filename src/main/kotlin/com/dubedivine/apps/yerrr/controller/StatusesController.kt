@@ -50,7 +50,7 @@ class StatusesController(private val userRepository: UserRepository,
 
     @PostMapping("{status_id}/files")
     fun addFiles(@PathVariable("status_id") statusId: String,
-                 @RequestPart() files: List<MultipartFile>): ResponseEntity<StatusResponseEntity<Status>> {
+                 @RequestPart files: List<MultipartFile>): ResponseEntity<StatusResponseEntity<Status>> {
         return when (val status = repository.findByIdOrNull(statusId)) {
             null -> {
                 response(CANNOT_FIND_STATUS, null, false, HttpStatus.NOT_FOUND)
