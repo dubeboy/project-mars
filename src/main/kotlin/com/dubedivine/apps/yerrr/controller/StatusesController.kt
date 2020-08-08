@@ -21,6 +21,7 @@ class StatusesController(private val userRepository: UserRepository,
         return response("", repository.findAll())
     }
 
+    // TODO: maybe create a handshake JWT everytime a user is posting to verify device, we could use FCM
     @PutMapping
     fun create(@RequestBody status: Status): Response<Status> {
         val user = userRepository.findByIdOrNull(status.user.id)
