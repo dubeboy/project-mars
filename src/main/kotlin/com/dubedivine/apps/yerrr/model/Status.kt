@@ -15,6 +15,6 @@ data class Status(
         var comments: List<Comment> = emptyList(),
         var isDeleted: Boolean = false,
         val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
-        val media: List<Media>? = null,
+        var media: List<Media>? = null,
         val createdAt: Date = Date()
 )

@@ -1,0 +1,17 @@
+###
+GET http://localhost:8080/statuses
+
+<> 2020-08-08T045035.200.json
+
+### Send a POST request to update existing post
+POST https://httpbin.org/post
+Content-Type: application/json
+
+{
+  "id": {{$uuid}},
+  "price": {{$randomInt}},
+  "ts": {{$timestamp}},
+  "value": "content"
+}
+
+### Send a POST request to update append Media of type form-data

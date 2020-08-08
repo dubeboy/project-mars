@@ -14,7 +14,7 @@ data class User(
         val handle: String, // Might serve as a handle @something_spicy
         @Indexed(unique = true)
         val phoneNumber: String, // might want to have this be a computed variable of PhoneNumber
-        val media: Media?,
+        val profile: Media?,
         val statuses: List<User> = emptyList(),
         val point: Point?
 )

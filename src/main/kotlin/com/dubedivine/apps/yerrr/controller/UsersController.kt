@@ -63,6 +63,7 @@ class UsersController(private val userRepository: UserRepository) {
             phoneNumber.phoneNumber.length == KUtils.correctPhoneNumberLength(phoneNumber)
     /**
      * This is so that when we want to centralise all the error messages to one library we can then do so
+     * 2) provide meaningful errors
      * */
     companion object {
         const val USER_EXISTS_MESSAGE = "Signing you in..."
