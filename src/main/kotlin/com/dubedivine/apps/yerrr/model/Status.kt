@@ -8,13 +8,13 @@ import java.util.*
 
 @Document
 data class Status(
-        @Id
-        val id: String,
         val body: String,
-        var user: User,
+        var user: User = User("1000", "Booty", "@bootynizer", "0891231234", null, emptyList(), null),
+        @Id
+        var id: String? = null,
+        var comments: List<Comment> = emptyList(),
+        var isDeleted: Boolean = false,
+        val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
         val media: List<Media>? = null,
-        val createdAt: Date,
-        var comments: List<Comment>,
-        var isDeleted: Boolean,
-        val distanceFromYouval: Double // TODO: use MONGO geolocation here
+        val createdAt: Date = Date()
 )

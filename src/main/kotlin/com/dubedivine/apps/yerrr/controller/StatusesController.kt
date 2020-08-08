@@ -2,7 +2,9 @@ package com.dubedivine.apps.yerrr.controller
 
 import com.dubedivine.apps.yerrr.Repository.StatusRepository
 import com.dubedivine.apps.yerrr.Repository.UserRepository
+import com.dubedivine.apps.yerrr.model.PhoneNumber
 import com.dubedivine.apps.yerrr.model.Status
+import com.dubedivine.apps.yerrr.model.User
 import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.badRequestResponse
 import com.dubedivine.apps.yerrr.utils.createdResponse
@@ -24,11 +26,15 @@ class StatusesController(private val userRepository: UserRepository,
     // TODO: maybe create a handshake JWT everytime a user is posting to verify device, we could use FCM
     @PutMapping
     fun create(@RequestBody status: Status): Response<Status> {
-        val user = userRepository.findByIdOrNull(status.user.id)
-                ?: return badRequestResponse("Something went wrong, please try logging in again", null)
-        status.user = user
+//        val user = userRepository.findByIdOrNull(status.user.id)
+//                ?: return badRequestResponse("Something went wrong, please try logging in again", null)
+//        status.user = user
         val insertedStatus = repository.insert(status)
         return createdResponse("Successfully posted new status", insertedStatus)
+    }
+
+    private fun createHandle(handle: String): String {
+        return "@$handle"
     }
 
     @PostMapping
