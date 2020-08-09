@@ -28,6 +28,7 @@ class StatusesController(private val userRepository: UserRepository,
     }
 
     // TODO: maybe create a handshake JWT everytime a user is posting to verify device, we could use FCM
+    // also limit the number of characters
     @PutMapping
     fun create(@RequestBody status: Status): Response<Status> {
 //        val user = userRepository.findByIdOrNull(status.user.id)
@@ -37,11 +38,23 @@ class StatusesController(private val userRepository: UserRepository,
         return createdResponse("Successfully posted new status", insertedStatus)
     }
 
+    @GetMapping("{status_id}")
+    fun getStatus(@PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Status>> {
+        val status = repository.findByIdOrNull(statusId)
+        return when (status != null) {
+            true -> {
+               response("", status)
+            }
+            false -> {
+                response(STATUS_NOT_FOUND, null, false)
+            }
+        }
+    }
+
     private fun createHandle(handle: String): String {
         return "@$handle"
     }
 
-    // Check for errasure
     @PostMapping
     fun update(@RequestBody status: Status): Response<Status> {
         val savedStatus = repository.save(status)
@@ -53,7 +66,7 @@ class StatusesController(private val userRepository: UserRepository,
                  @RequestPart files: List<MultipartFile>): ResponseEntity<StatusResponseEntity<Status>> {
         return when (val status = repository.findByIdOrNull(statusId)) {
             null -> {
-                response(CANNOT_FIND_STATUS, null, false, HttpStatus.NOT_FOUND)
+                response(FILE_CANNOT_FIND_STATUS, null, false, HttpStatus.NOT_FOUND)
             }
             else -> {
                 val media = KUtils.createMedia(files, gridFSOperations)
@@ -65,8 +78,9 @@ class StatusesController(private val userRepository: UserRepository,
     }
 
     companion object {
-        const val CANNOT_FIND_STATUS = "Sorry could not add files because we could not find that Status"
+        const val FILE_CANNOT_FIND_STATUS = "Sorry could not add files because we could not find that Status"
         const val MEDIA_SAVED = "successfully posted media"
+        const val STATUS_NOT_FOUND = "Sorry could not find that Status"
     }
 
 }
