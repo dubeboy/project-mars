@@ -1,6 +1,7 @@
 package com.dubedivine.apps.yerrr.model
 
 import com.mongodb.lang.Nullable
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -8,15 +9,15 @@ import org.springframework.data.mongodb.core.mapping.Document
 // Could also add the ability to sign in using email
 @Document
 data class User(
-        @Id val id: String,
+        @Id val id: String, // should change to object ID
         val name: String,
         @Indexed(unique = true)
         val handle: String, // Might serve as a handle @something_spicy
         @Indexed(unique = true)
         val phoneNumber: String, // might want to have this be a computed variable of PhoneNumber
         val profile: Media?,
-        val statuses: List<User> = emptyList(),
-        val point: Point?
+        val statuses: List<User> = emptyList(), // put this last please!!!
+        val point: Point?  // please change these
 )
 
 enum class CountryCode(val countryCode: String) {

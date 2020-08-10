@@ -2,22 +2,6 @@
 ### request all states
 GET http://localhost:8080/statuses
 
-<> 2020-08-08T045035.200.json
-
-### Send a POST request to update existing post
-POST https://httpbin.org/post
-Content-Type: application/json
-
-{
-  "id": {{$uuid}},
-  "price": {{$randomInt}},
-  "ts": {{$timestamp}},
-  "value": "content"
-}
-
-### Send a POST request to update append Media of type form-data file name file
-
-
 ### Request a single Status
 GET localhost:8080/statuses/{{status_id}}
 
@@ -59,3 +43,20 @@ Content-Type: application/json
     "statusId": "5f309adb3dd75b62ddacf344"
   }
 }
+
+### post comment
+
+POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comment
+Content-Type: application/json
+
+{
+  "body": "dfgdfgdfgfdgdfgfdgdfgfdgdfgdfgfdgdfggdfgdfgdfgdfgdfgdfgdfgdfgdfgfdgdfgdfgdf jsdsjdgdfgdfdsdjsdsjdsjdsjdsd vfdgfdgfdggdfgdfgdfgfdg"
+}
+
+### get comment
+// 5f31290c1b6c3552137e8545
+// 5f31291c1b6c3552137e8546
+
+GET {{host}}/statuses/5f309adb3dd75b62ddacf344/comment/5f313f7868ed2b2f78b78beb
+Content-Type: application/json
+

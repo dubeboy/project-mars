@@ -1,13 +1,14 @@
 package com.dubedivine.apps.yerrr.model
 
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import java.util.*
 
 data class Comment(
-        @Id
-        val id: String,
-        val name: String,
-        val createdAt: Date = Date(),
         val body: String,
-        val media: Media? = null
+        val user: User = User("2000", "Johnna", "@johnna_major_league", "09809876098", null, emptyList(), null),
+        val media: Media? = null,
+        val createdAt: Date = Date(),
+        var isDeleted: Boolean = false,
+        val id: String = ObjectId().toHexString()
 )
