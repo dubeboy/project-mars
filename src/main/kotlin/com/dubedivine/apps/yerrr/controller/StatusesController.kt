@@ -76,12 +76,12 @@ class StatusesController(private val userRepository: UserRepository,
 
     @GetMapping("{status_id}/comment/{comment_id}")
     fun getComment(@PathVariable("comment_id") commentId: String,
-                   @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<List<Status>>> {
+                   @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Comment>> {
         val query = Query()
         query.addCriteria(Criteria.where("_id").`is`(ObjectId(statusId)).and("comments._id").isEqualTo(ObjectId(commentId)))
         query.fields().position("comments", 1)
-        val comments: List<Status> = mongoTemplate.find(query, Status::class.java)
-        return response("", comments)
+        val status: List<Status>? = mongoTemplate.find(query, Status::class.java)
+        return response("", status?.get(0)?.comments?.get(0))
     }
 
     @GetMapping("{status_id}/comment")

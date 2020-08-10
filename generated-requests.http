@@ -50,13 +50,13 @@ POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comment
 Content-Type: application/json
 
 {
-  "body": "dfgdfgdfgfdgdfgfdgdfgfdgdfgdfgfdgdfggdfgdfgdfgdfgdfgdfgdfgdfgdfgfdgdfgdfgdf jsdsjdgdfgdfdsdjsdsjdsjdsjdsd vfdgfdgfdggdfgdfgdfgfdg"
+  "body": "gg jsdsjdgdfgdfdsdjsdsjdsjdsjdsd vfdgfdgfdggdfgdfgdfgfdg"
 }
 
 ### get comment
 // 5f31290c1b6c3552137e8545
 // 5f31291c1b6c3552137e8546
 
-GET {{host}}/statuses/5f309adb3dd75b62ddacf344/comment/5f313f7868ed2b2f78b78beb
+GET {{host}}/statuses/5f309adb3dd75b62ddacf344/comment/5f314171c576d148fbc1f295
 Content-Type: application/json
 

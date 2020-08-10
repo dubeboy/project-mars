@@ -14,7 +14,7 @@ data class Status(
         var user: User = User("1000", "Booty", "@bootynizer", "0891231234", null, emptyList(), null),
         @Id
         var id: String? = null,
-//        @JsonIgnore
+        @JsonIgnore
         var comments: ArrayList<Comment> = java.util.ArrayList(),
         var isDeleted: Boolean = false,
         val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
