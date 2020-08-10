@@ -1,4 +1,5 @@
-###
+### https://www.jetbrains.com/help/idea/exploring-http-syntax.html#enable-disable-redirects
+### request all states
 GET http://localhost:8080/statuses
 
 <> 2020-08-08T045035.200.json
@@ -17,3 +18,31 @@ Content-Type: application/json
 ### Send a POST request to update append Media of type form-data file name file
 
 
+### Request a single Status
+GET localhost:8080/statuses/{{status_id}}
+
+### Vote on a status down
+
+POST {{host}}/statuses/vote
+Content-Type: application/json
+
+{
+  "direction": false,
+  "id":  {
+  "userId": "1000",
+  "statusId": "5f309adb3dd75b62ddacf344"
+  }
+}
+
+### Vote on a status up
+
+POST {{host}}/statuses/vote
+Content-Type: application/json
+
+{
+  "direction": true,
+  "id":  {
+  "userId": "1000",
+  "statusId": "5f309adb3dd75b62ddacf344"
+  }
+}

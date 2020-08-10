@@ -1,6 +1,6 @@
 package com.dubedivine.apps.yerrr.controller
 
-import com.dubedivine.apps.yerrr.Repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.UserRepository
 import com.dubedivine.apps.yerrr.model.PhoneNumber
 import org.springframework.web.bind.annotation.*
 import com.dubedivine.apps.yerrr.model.User

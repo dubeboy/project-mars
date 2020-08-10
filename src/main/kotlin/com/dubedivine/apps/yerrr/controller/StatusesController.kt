@@ -1,8 +1,10 @@
 package com.dubedivine.apps.yerrr.controller
 
-import com.dubedivine.apps.yerrr.Repository.StatusRepository
-import com.dubedivine.apps.yerrr.Repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.StatusRepository
+import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.VoteRepository
 import com.dubedivine.apps.yerrr.model.Status
+import com.dubedivine.apps.yerrr.model.Vote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.Response
@@ -19,11 +21,12 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("statuses")
 class StatusesController(private val userRepository: UserRepository,
                          private val repository: StatusRepository,
+                         private val voteRepository: VoteRepository,
                          private val gridFSOperations: GridFsOperations) {
 
     @GetMapping
     fun all(): Response<List<Status>> {
-        // TODO: Order by geolocation
+        // TODO: Order by geolocation and filter by not deleted
         return response("", repository.findAll())
     }
 
@@ -35,9 +38,10 @@ class StatusesController(private val userRepository: UserRepository,
 //                ?: return badRequestResponse("Something went wrong, please try logging in again", null)
 //        status.user = user
         val insertedStatus = repository.insert(status)
-        return createdResponse("Successfully posted new status", insertedStatus)
+        return createdResponse(STATUS_POSTED, insertedStatus)
     }
 
+    // should return a Pair rather
     @GetMapping("{status_id}")
     fun getStatus(@PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Status>> {
         val status = repository.findByIdOrNull(statusId)
@@ -49,6 +53,42 @@ class StatusesController(private val userRepository: UserRepository,
                 response(STATUS_NOT_FOUND, null, false)
             }
         }
+    }
+
+    @PostMapping("vote")
+    fun vote(@RequestBody vote: Vote): ResponseEntity<StatusResponseEntity<Boolean>> {
+        val status = repository.findByIdOrNull(vote.id.statusId)
+                ?: return response(STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
+        val existingVote = voteRepository.findById(vote.id).orElse(null)
+
+        when {
+            existingVote != null -> {
+                return when (existingVote.direction) {
+                    vote.direction -> {  // we do not allow `up up` or `down down` so remove it and udo their last vote
+                        existingVote.isDeleted = true // remove the vote
+                        voteRepository.save(existingVote)
+                        updateStatusVotes(!vote.direction, status) // TODO: off by one error
+                        response(VOTE_REMOVED, true)
+                    }
+                    else -> { // Direction is not the same!
+                        existingVote.direction = vote.direction
+                        voteRepository.save(existingVote)
+                        updateStatusVotes(vote.direction, status)
+                    }
+                }
+            } // New Vote
+            else -> {
+                voteRepository.save(vote)
+                return updateStatusVotes(vote.direction, status)
+            }
+        }
+
+    }
+
+    private fun updateStatusVotes(direction: Boolean, status: Status): ResponseEntity<StatusResponseEntity<Boolean>> {
+        if (direction) status.votes += 1 else status.votes -= 1
+        repository.save(status)
+        return response(VOTED.format(if (direction) "up" else "down"), true)
     }
 
     private fun createHandle(handle: String): String {
@@ -78,9 +118,12 @@ class StatusesController(private val userRepository: UserRepository,
     }
 
     companion object {
-        const val FILE_CANNOT_FIND_STATUS = "Sorry could not add files because we could not find that Status"
-        const val MEDIA_SAVED = "successfully posted media"
-        const val STATUS_NOT_FOUND = "Sorry could not find that Status"
+        const val STATUS_POSTED = "Posted new status"
+        const val FILE_CANNOT_FIND_STATUS = "Sorry could not add files because we could not find that Status."
+        const val MEDIA_SAVED = "Posted media."
+        const val STATUS_NOT_FOUND = "Sorry, could not find that Status."
+        const val VOTE_REMOVED = "Vote removed"
+        const val VOTED = "%s voted."
     }
 
 }

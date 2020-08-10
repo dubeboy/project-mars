@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-// TODO: add a flag to this later
+// TODO: add a report flag to this later
 
 @Document
 data class Status(
@@ -16,5 +16,7 @@ data class Status(
         var isDeleted: Boolean = false,
         val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
         var media: List<Media>? = null,
+        var likes: Int = 0, // A positive integer
+        var votes: Int = 0, // negative and positive integer
         val createdAt: Date = Date()
 )

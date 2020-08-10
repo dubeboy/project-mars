@@ -1,23 +1,26 @@
 package com.dubedivine.apps.yerrr.config
 
-import com.dubedivine.apps.yerrr.Repository.StatusRepository
+import com.dubedivine.apps.yerrr.repository.StatusRepository
 import com.dubedivine.apps.yerrr.model.Status
+import com.dubedivine.apps.yerrr.repository.VoteRepository
 import org.springframework.boot.CommandLineRunner import org.springframework.stereotype.Component
 /**
  * This is a seed class that creates constant so that we can easily test or api
  * we can alyways put more data if we need to
 * */
 @Component
-class DBHelper(private val repository: StatusRepository): CommandLineRunner {
+class DBHelper(private val repository: StatusRepository,
+               private val voteRepository: VoteRepository): CommandLineRunner {
     override fun run(vararg args: String?) {
         println("💣 Deleting everything....")
         repository.deleteAll()
+        voteRepository.deleteAll()
         println("💣 Done \uD83D\uDCA3")
 
         val statuses = arrayListOf(
                 Status("""Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been th
                             |e industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                            | type and scrambled it to make a type specimen book.""".trimMargin()),
+                            | type and scrambled it to make a type specimen book.""".trimMargin(), id = "5f309adb3dd75b62ddacf344"), // THis one is for testing
                 Status("""Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been th
                             | type and scrambled it to make a type specimen book.""".trimMargin()),
                 Status("""Lorem Ipsum has been th

@@ -1,6 +1,5 @@
-package com.dubedivine.apps.yerrr.Repository
+package com.dubedivine.apps.yerrr.repository
 
-import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.User
 import org.springframework.data.mongodb.repository.MongoRepository
 
