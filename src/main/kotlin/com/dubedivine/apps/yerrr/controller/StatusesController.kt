@@ -47,7 +47,7 @@ class StatusesController(private val userRepository: UserRepository,
         val status = repository.findByIdOrNull(statusId)
         return when (status != null) {
             true -> {
-               response("", status)
+                response("", status)
             }
             false -> {
                 response(STATUS_NOT_FOUND, null, false)
@@ -55,22 +55,38 @@ class StatusesController(private val userRepository: UserRepository,
         }
     }
 
+    @PostMapping("vote/delete")
+    fun removeVote(@RequestBody vote: Vote): ResponseEntity<StatusResponseEntity<Boolean>> {
+        val status = repository.findByIdOrNull(vote.id.statusId)
+                ?: return response(STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
+        val existingVote = voteRepository.findById(vote.id).orElse(null)
+
+        return when {
+            existingVote != null -> { // we just undo the last action
+                existingVote.isDeleted = true // remove the vote
+                voteRepository.save(existingVote)
+                if (existingVote.valueWhenVoted != status.votes) updateStatusVotes(!existingVote.direction, status)
+                else response(VOTE_REMOVED, true)
+            }
+            else -> {
+                response(VOTE_YOU_HAVE_NOT_VOTED_YET, null, false, HttpStatus.BAD_REQUEST)
+            }
+        }
+    }
+
+
     @PostMapping("vote")
     fun vote(@RequestBody vote: Vote): ResponseEntity<StatusResponseEntity<Boolean>> {
         val status = repository.findByIdOrNull(vote.id.statusId)
                 ?: return response(STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
         val existingVote = voteRepository.findById(vote.id).orElse(null)
-
         when {
             existingVote != null -> {
-                return when (existingVote.direction) {
-                    vote.direction -> {  // we do not allow `up up` or `down down` so remove it and udo their last vote
-                        existingVote.isDeleted = true // remove the vote
-                        voteRepository.save(existingVote)
-                        updateStatusVotes(!vote.direction, status) // TODO: off by one error
-                        response(VOTE_REMOVED, true)
+                return when (existingVote.direction == vote.direction) {
+                    true -> {
+                        response(VOTE_TWICE_SHOULD_NOT_HAPPEN, null, false, HttpStatus.FORBIDDEN)
                     }
-                    else -> { // Direction is not the same!
+                    else -> { // UPDATE!! Direction is not the same!
                         existingVote.direction = vote.direction
                         voteRepository.save(existingVote)
                         updateStatusVotes(vote.direction, status)
@@ -78,11 +94,11 @@ class StatusesController(private val userRepository: UserRepository,
                 }
             } // New Vote
             else -> {
+                vote.valueWhenVoted = status.votes
                 voteRepository.save(vote)
                 return updateStatusVotes(vote.direction, status)
             }
         }
-
     }
 
     private fun updateStatusVotes(direction: Boolean, status: Status): ResponseEntity<StatusResponseEntity<Boolean>> {
@@ -98,7 +114,7 @@ class StatusesController(private val userRepository: UserRepository,
     @PostMapping
     fun update(@RequestBody status: Status): Response<Status> {
         val savedStatus = repository.save(status)
-        return response("Succesfully updated status",  savedStatus)
+        return response("Succesfully updated status", savedStatus)
     }
 
     @PostMapping("{status_id}/files")
@@ -122,6 +138,8 @@ class StatusesController(private val userRepository: UserRepository,
         const val FILE_CANNOT_FIND_STATUS = "Sorry could not add files because we could not find that Status."
         const val MEDIA_SAVED = "Posted media."
         const val STATUS_NOT_FOUND = "Sorry, could not find that Status."
+        const val VOTE_TWICE_SHOULD_NOT_HAPPEN = "Vote twice should not happen"
+        const val VOTE_YOU_HAVE_NOT_VOTED_YET = "You have not voted on this Status therefore we cannot remove it"
         const val VOTE_REMOVED = "Vote removed"
         const val VOTED = "%s voted."
     }

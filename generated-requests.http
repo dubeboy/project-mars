@@ -46,3 +46,16 @@ Content-Type: application/json
   "statusId": "5f309adb3dd75b62ddacf344"
   }
 }
+
+
+### remove the last vote I did and undo what ever the vote was
+
+POST {{host}}/statuses/vote/delete
+Content-Type: application/json
+
+{
+  "id":  {
+    "userId": "1000",
+    "statusId": "5f309adb3dd75b62ddacf344"
+  }
+}
