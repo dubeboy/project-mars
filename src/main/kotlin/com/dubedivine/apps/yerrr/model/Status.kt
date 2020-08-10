@@ -16,6 +16,7 @@ data class Status(
         var id: String? = null,
         @JsonIgnore
         var comments: ArrayList<Comment> = java.util.ArrayList(),
+        @JsonIgnore
         var isDeleted: Boolean = false,
         val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
         var media: List<Media>? = null,
