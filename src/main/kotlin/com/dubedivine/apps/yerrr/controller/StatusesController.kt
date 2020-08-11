@@ -164,6 +164,7 @@ class StatusesController(private val userRepository: UserRepository,
             }
             else -> {
                 val media = KUtils.createMedia(files, gridFSOperations)
+                // status.media.addAll(media)
                 status.media = media
                 response(MEDIA_SAVED, repository.save(status))
             }

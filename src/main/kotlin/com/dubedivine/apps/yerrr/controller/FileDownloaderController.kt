@@ -1,5 +1,6 @@
 package com.dubedivine.apps.yerrr.controller
 
+import org.bson.types.ObjectId
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query.query
@@ -18,15 +19,15 @@ import java.io.InputStream
 
 
 @RestController
-@RequestMapping // I would like to make the request look like its just getting a static resource
-class FileDownloaderController(val gridFsOperations: GridFsOperations) {
+@RequestMapping("assets") // I would like to make the request look like its just getting a static resource
+class FileDownloaderController(private val gridFsOperations: GridFsOperations) {
     @GetMapping("{id}")
     fun getFile(@PathVariable id: String): ResponseEntity<ByteArrayResource> {
         try {
             println("the Id id $id")
-            val gridFSFile = gridFsOperations.findOne(query(where("_id").isEqualTo(id)))
+            val gridFSFile = gridFsOperations.findOne(query(where("_id").isEqualTo(ObjectId(id))))
 
-            if (gridFSFile?.length != 0L) {
+            if (gridFSFile?.length != null && gridFSFile.length != 0L) {
 
                 val filename = gridFSFile!!.filename
                 val metaData = gridFSFile.metadata // todo : get it from mime
@@ -49,7 +50,7 @@ class FileDownloaderController(val gridFsOperations: GridFsOperations) {
                 return ResponseEntity(HttpStatus.NO_CONTENT)
             }
         } catch (ia: IllegalArgumentException) {
-            println("sorry could not find that file")
+            println("sorry could not find that file error: $ia")
             return ResponseEntity(HttpStatus.NO_CONTENT)
         }
     }

@@ -19,7 +19,7 @@ data class Status(
         @JsonIgnore
         var isDeleted: Boolean = false,
         val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
-        var media: List<Media>? = null,
+        var media: ArrayList<Media> = ArrayList(),
         var likes: Int = 0, // A positive integer
         var votes: Int = 10, // negative and positive integer
         val createdAt: Date = Date()
