@@ -29,7 +29,7 @@ class FileDownloaderController(private val gridFsOperations: GridFsOperations) {
 
             if (gridFSFile?.length != null && gridFSFile.length != 0L) {
 
-                val filename = gridFSFile!!.filename
+                val filename = gridFSFile.filename
                 val metaData = gridFSFile.metadata // todo : get it from mime
 
                 val inputStream = gridFsOperations.getResource(gridFSFile).inputStream
