@@ -2,7 +2,7 @@ package com.dubedivine.apps.yerrr.config
 
 import com.dubedivine.apps.yerrr.repository.StatusRepository
 import com.dubedivine.apps.yerrr.model.Status
-import com.dubedivine.apps.yerrr.repository.VoteRepository
+import com.dubedivine.apps.yerrr.repository.shared.VoteRepository
 import org.springframework.boot.CommandLineRunner import org.springframework.stereotype.Component
 /**
  * This is a seed class that creates constant so that we can easily test or api

@@ -26,15 +26,6 @@ fun <T> response(message: String, entity: T?, status: Boolean = true, httpStatus
     )
 }
 
-fun <T> badRequestResponse(message: String, entity: T?): ResponseEntity<StatusResponseEntity<T>> {
-    return response(
-            message,
-            entity,
-            false,
-            HttpStatus.BAD_REQUEST
-    )
-}
-
 fun <T> createdResponse(message: String, entity: T?): ResponseEntity<StatusResponseEntity<T>> {
     return response(
             message,

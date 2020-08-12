@@ -2,17 +2,15 @@ package com.dubedivine.apps.yerrr.controller
 
 import com.dubedivine.apps.yerrr.model.Comment
 import com.dubedivine.apps.yerrr.model.Status
-import com.dubedivine.apps.yerrr.model.Vote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.StatusRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
-import com.dubedivine.apps.yerrr.repository.VoteRepository
+import com.dubedivine.apps.yerrr.repository.shared.VoteRepository
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.createdResponse
 import com.dubedivine.apps.yerrr.utils.response
 import org.bson.types.ObjectId
-import org.springframework.data.domain.Example
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -29,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("statuses")
 class StatusesController(private val userRepository: UserRepository,
                          private val repository: StatusRepository,
-                         private val voteRepository: VoteRepository,
+//                         private val voteRepository: VoteRepository,
                          private val gridFSOperations: GridFsOperations,
                          private val mongoTemplate: MongoTemplate) {
 
@@ -82,67 +80,13 @@ class StatusesController(private val userRepository: UserRepository,
         query.addCriteria(Criteria.where("_id").`is`(ObjectId(statusId)).and("comments._id").isEqualTo(ObjectId(commentId)))
         query.fields().position("comments", 1)
         val status: List<Status>? = mongoTemplate.find(query, Status::class.java)
-        return response("", status?.get(0)?.comments?.get(0))
+        return response("", status?.first()?.comments?.first())
     }
 
     @GetMapping("{status_id}/comment")
     fun getComments(@PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<List<Comment>>> {
         val status = repository.findByIdOrNull(statusId) ?: return response(STATUS_NOT_FOUND, null, false)
         return response("", status.comments) // TODO: should use criteria to page response
-    }
-
-    // TODO:  SHOULD GO TO ONE CLASS: VOTE!
-
-    @PostMapping("vote/delete")
-    fun removeVote(@RequestBody vote: Vote): ResponseEntity<StatusResponseEntity<Boolean>> {
-        val status = repository.findByIdOrNull(vote.id.statusId)
-                ?: return response(STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
-        val existingVote = voteRepository.findById(vote.id).orElse(null)
-
-        return when {
-            existingVote != null -> { // we just undo the last action
-                existingVote.isDeleted = true // remove the vote
-                voteRepository.save(existingVote)
-                if (existingVote.valueWhenVoted != status.votes) updateStatusVotes(!existingVote.direction, status)
-                else response(VOTE_REMOVED, true)
-            }
-            else -> {
-                response(VOTE_YOU_HAVE_NOT_VOTED_YET, null, false, HttpStatus.BAD_REQUEST)
-            }
-        }
-    }
-
-
-    @PostMapping("vote")
-    fun vote(@RequestBody vote: Vote): ResponseEntity<StatusResponseEntity<Boolean>> {
-        val status = repository.findByIdOrNull(vote.id.statusId)
-                ?: return response(STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
-        val existingVote = voteRepository.findById(vote.id).orElse(null)
-        when {
-            existingVote != null -> {
-                return when (existingVote.direction == vote.direction) {
-                    true -> {
-                        response(VOTE_TWICE_SHOULD_NOT_HAPPEN, null, false, HttpStatus.FORBIDDEN)
-                    }
-                    else -> { // UPDATE!! Direction is not the same!
-                        existingVote.direction = vote.direction
-                        voteRepository.save(existingVote)
-                        updateStatusVotes(vote.direction, status)
-                    }
-                }
-            } // New Vote
-            else -> {
-                vote.valueWhenVoted = status.votes
-                voteRepository.save(vote)
-                return updateStatusVotes(vote.direction, status)
-            }
-        }
-    }
-
-    private fun updateStatusVotes(direction: Boolean, status: Status): ResponseEntity<StatusResponseEntity<Boolean>> {
-        if (direction) status.votes += 1 else status.votes -= 1
-        repository.save(status)
-        return response(VOTED.format(if (direction) "up" else "down"), true)
     }
 
     private fun createHandle(handle: String): String {

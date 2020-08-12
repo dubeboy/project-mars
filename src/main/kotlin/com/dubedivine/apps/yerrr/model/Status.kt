@@ -1,5 +1,6 @@
 package com.dubedivine.apps.yerrr.model
 
+import com.dubedivine.apps.yerrr.model.abstractEntity.Votable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -20,7 +21,7 @@ data class Status(
         var isDeleted: Boolean = false,
         val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
         var media: ArrayList<Media> = ArrayList(),
-        var likes: Int = 0, // A positive integer
-        var votes: Int = 10, // negative and positive integer
+        override var likes: Long = 0, // A positive integer
+        override var votes: Long = 0, // negative and positive integer
         val createdAt: Date = Date()
-)
+): Votable
