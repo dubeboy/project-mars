@@ -70,4 +70,8 @@ class UsersController(private val userRepository: UserRepository) {
         const val USER_REGISTRATION_SUCCESSFUL = "Successfully registered"
         const val USER_DOES_NOT_EXIST = "Please create a new user"
     }
+
+    fun calculateUserPoints() {
+
+    }
 }
