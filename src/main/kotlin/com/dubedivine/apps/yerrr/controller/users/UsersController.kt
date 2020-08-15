@@ -1,4 +1,4 @@
-package com.dubedivine.apps.yerrr.controller
+package com.dubedivine.apps.yerrr.controller.users
 
 import com.dubedivine.apps.yerrr.repository.UserRepository
 import com.dubedivine.apps.yerrr.model.PhoneNumber

@@ -2,18 +2,27 @@ package com.dubedivine.apps.yerrr.config
 
 import com.dubedivine.apps.yerrr.repository.StatusRepository
 import com.dubedivine.apps.yerrr.model.Status
+import com.dubedivine.apps.yerrr.repository.StatusVoteRepository
 import com.dubedivine.apps.yerrr.repository.shared.VoteRepository
-import org.springframework.boot.CommandLineRunner import org.springframework.stereotype.Component
+import org.springframework.boot.CommandLineRunner
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.where
+import org.springframework.data.mongodb.gridfs.GridFsOperations
+import org.springframework.stereotype.Component
 /**
  * This is a seed class that creates constant so that we can easily test or api
  * we can alyways put more data if we need to
 * */
 @Component
 class DBHelper(private val repository: StatusRepository,
-               private val voteRepository: VoteRepository): CommandLineRunner {
+               private val voteRepository: StatusVoteRepository,
+               private val statusCommentRepository: StatusVoteRepository,
+               private val gridFsOperations: GridFsOperations): CommandLineRunner {
     override fun run(vararg args: String?) {
         println("💣 Deleting everything....")
         repository.deleteAll()
+        statusCommentRepository.deleteAll()
+        gridFsOperations.delete(Query())
         voteRepository.deleteAll()
         println("💣 Done \uD83D\uDCA3")
 

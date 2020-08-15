@@ -1,11 +1,13 @@
-package com.dubedivine.apps.yerrr.controller
+package com.dubedivine.apps.yerrr.controller.status
 
+import com.dubedivine.apps.yerrr.controller.shared.SharedVoteController
 import com.dubedivine.apps.yerrr.model.Comment
 import com.dubedivine.apps.yerrr.model.Status
+import com.dubedivine.apps.yerrr.model.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.StatusRepository
+import com.dubedivine.apps.yerrr.repository.StatusVoteRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
-import com.dubedivine.apps.yerrr.repository.shared.VoteRepository
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.createdResponse
@@ -27,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("statuses")
 class StatusesController(private val userRepository: UserRepository,
                          private val repository: StatusRepository,
-//                         private val voteRepository: VoteRepository,
+                         private val voteRepository: StatusVoteRepository,
                          private val gridFSOperations: GridFsOperations,
                          private val mongoTemplate: MongoTemplate) {
 
@@ -63,30 +65,16 @@ class StatusesController(private val userRepository: UserRepository,
         }
     }
 
-    // TODO:  SHOULD GO TO ONE CLASS: COMMENT
+    // TODO: could actually move this to its own controller
 
-    @PostMapping("{status_id}/comment")
-    fun comment(@RequestBody comment: Comment, @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<String>> {
-        val status = repository.findByIdOrNull(statusId) ?: return response(STATUS_NOT_FOUND, null, false)
-        status.comments.add(comment)
-        repository.save(status)
-        return response("", comment.id)
+    @PostMapping("vote")
+    fun vote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
+        return SharedVoteController.vote(voteRepository, repository, vote)
     }
 
-    @GetMapping("{status_id}/comment/{comment_id}")
-    fun getComment(@PathVariable("comment_id") commentId: String,
-                   @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Comment>> {
-        val query = Query()
-        query.addCriteria(Criteria.where("_id").`is`(ObjectId(statusId)).and("comments._id").isEqualTo(ObjectId(commentId)))
-        query.fields().position("comments", 1)
-        val status: List<Status>? = mongoTemplate.find(query, Status::class.java)
-        return response("", status?.first()?.comments?.first())
-    }
-
-    @GetMapping("{status_id}/comment")
-    fun getComments(@PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<List<Comment>>> {
-        val status = repository.findByIdOrNull(statusId) ?: return response(STATUS_NOT_FOUND, null, false)
-        return response("", status.comments) // TODO: should use criteria to page response
+    @PostMapping("vote/delete")
+    fun removeVote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
+        return SharedVoteController.removeVote(voteRepository, repository, vote)
     }
 
     private fun createHandle(handle: String): String {
@@ -113,7 +101,6 @@ class StatusesController(private val userRepository: UserRepository,
                 response(MEDIA_SAVED, repository.save(status))
             }
         }
-
     }
 
     companion object {
@@ -127,5 +114,4 @@ class StatusesController(private val userRepository: UserRepository,
         const val VOTE_REMOVED = "Vote removed"
         const val VOTED = "%s voted."
     }
-
 }

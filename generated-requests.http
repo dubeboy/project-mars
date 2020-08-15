@@ -14,7 +14,7 @@ Content-Type: application/json
   "direction": false,
   "id":  {
   "userId": "1000",
-  "statusId": "5f309adb3dd75b62ddacf344"
+  "entityId": "5f309adb3dd75b62ddacf344"
   }
 }
 
@@ -27,36 +27,57 @@ Content-Type: application/json
   "direction": true,
   "id":  {
   "userId": "1000",
-  "statusId": "5f309adb3dd75b62ddacf344"
+  "entityId": "5f309adb3dd75b62ddacf344"
   }
 }
 
-
 ### remove the last vote I did and undo what ever the vote was
-
 POST {{host}}/statuses/vote/delete
 Content-Type: application/json
 
 {
   "id":  {
     "userId": "1000",
-    "statusId": "5f309adb3dd75b62ddacf344"
+    "entityId": "5f309adb3dd75b62ddacf344"
   }
 }
 
+### ---- COMMENTS ----
+
 ### post comment
 
-POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comment
+POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comments
 Content-Type: application/json
 
 {
-  "body": "gg jsdsjdgdfgdfdsdjsdsjdsjdsjdsd vfdgfdgfdggdfgdfgdfgfdg"
+  "body": "gg hhhhhhhh vfdgfdgfdggdfgdfgdfgfdg"
 }
 
-### get comment
-// 5f31290c1b6c3552137e8545
-// 5f31291c1b6c3552137e8546
-
-GET {{host}}/statuses/5f309adb3dd75b62ddacf344/comment/5f314171c576d148fbc1f295
+### get comments
+GET {{host}}/statuses/5f309adb3dd75b62ddacf344/comments
 Content-Type: application/json
+
+### --- Vote on comments ---- DOES NOt work!!!
+
+POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comments/vote
+Content-Type: application/json
+
+{
+  "direction": true,
+  "id":  {
+    "userId": "1000",
+    "entityId": "5f37c3129da8811a712443b9"
+  }
+}
+
+### remove the last vote I did and undo what ever the vote was
+POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comments/vote/delete
+Content-Type: application/json
+
+{
+  "id":  {
+    "userId": "1000",
+    "entityId": "5f37c3129da8811a712443b9"
+  }
+}
 

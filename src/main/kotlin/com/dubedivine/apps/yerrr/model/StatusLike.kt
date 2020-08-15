@@ -10,3 +10,5 @@ data class StatusLike(@Id @Indexed(unique = true) override var id: UserEntityID,
                       @JsonIgnore
                       override var isDeleted: Boolean = false,
                       override var valueWhenVoted: Long = 0) : Vote
+
+typealias CommentLike = StatusLike

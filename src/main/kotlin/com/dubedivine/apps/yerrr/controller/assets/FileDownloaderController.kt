@@ -1,4 +1,4 @@
-package com.dubedivine.apps.yerrr.controller
+package com.dubedivine.apps.yerrr.controller.assets
 
 import org.bson.types.ObjectId
 import org.springframework.core.io.ByteArrayResource
