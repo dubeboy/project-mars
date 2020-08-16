@@ -69,6 +69,8 @@ class UsersController(private val userRepository: UserRepository) {
         const val USER_EXISTS_MESSAGE = "Signing you in..."
         const val USER_REGISTRATION_SUCCESSFUL = "Successfully registered"
         const val USER_DOES_NOT_EXIST = "Please create a new user"
+        const val USER_NOT_FOUND = "Use not found"
+
     }
 
     fun calculateUserPoints() {

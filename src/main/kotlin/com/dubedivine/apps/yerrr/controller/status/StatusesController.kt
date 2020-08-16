@@ -1,7 +1,6 @@
 package com.dubedivine.apps.yerrr.controller.status
 
 import com.dubedivine.apps.yerrr.controller.shared.SharedVoteController
-import com.dubedivine.apps.yerrr.model.Comment
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
@@ -12,11 +11,6 @@ import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.createdResponse
 import com.dubedivine.apps.yerrr.utils.response
-import org.bson.types.ObjectId
-import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.gridfs.GridFsOperations
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -30,8 +24,7 @@ import org.springframework.web.multipart.MultipartFile
 class StatusesController(private val userRepository: UserRepository,
                          private val repository: StatusRepository,
                          private val voteRepository: StatusVoteRepository,
-                         private val gridFSOperations: GridFsOperations,
-                         private val mongoTemplate: MongoTemplate) {
+                         private val gridFSOperations: GridFsOperations) {
 
     @GetMapping
     fun all(): Response<List<Status>> {
@@ -69,12 +62,12 @@ class StatusesController(private val userRepository: UserRepository,
 
     @PostMapping("vote")
     fun vote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
-        return SharedVoteController.vote(voteRepository, repository, vote)
+        return SharedVoteController.vote(voteRepository, repository, vote, userRepository)
     }
 
     @PostMapping("vote/delete")
     fun removeVote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
-        return SharedVoteController.removeVote(voteRepository, repository, vote)
+        return SharedVoteController.removeVote(voteRepository, repository, vote, userRepository)
     }
 
     private fun createHandle(handle: String): String {

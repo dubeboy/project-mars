@@ -8,7 +8,7 @@ import java.util.*
 
 data class Comment(
         val body: String,
-        val user: User = User("2000", "Johnna", "@johnna_major_league", "09809876098", null, emptyList(), null),
+        override var user: User = User("2000", "Johnna", "@johnna_major_league", "09809876098", null),
         val media: Media? = null,
         val createdAt: Date = Date(),
         override var votes: Long,

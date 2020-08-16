@@ -5,6 +5,7 @@ import com.dubedivine.apps.yerrr.model.UserEntityID
 import com.dubedivine.apps.yerrr.model.StatusVote
 import com.dubedivine.apps.yerrr.model.abstractEntity.Votable
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
+import com.dubedivine.apps.yerrr.repository.UserRepository
 import com.dubedivine.apps.yerrr.utils.response
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -15,13 +16,15 @@ import org.springframework.http.ResponseEntity
 /**
 * Shared voting!!!
  * Could make this an injectable class ??? for now its just a singleton
+ * and if these when you fix them
 * */
 
 object SharedVoteController {
 
     fun <T: Votable, V: MongoRepository<StatusVote, UserEntityID>> removeVote(voteRepository: V,
                                                                               repository: MongoRepository<T, String>,
-                                                                              vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
+                                                                              vote: StatusVote,
+                                                                              userRepository: UserRepository): ResponseEntity<StatusResponseEntity<Boolean>> {
         val votableEntity = repository.findByIdOrNull(vote.id.entityId)
                 ?: return response(StatusesController.STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
         val existingVote = voteRepository.findById(vote.id).orElse(null)
@@ -30,7 +33,7 @@ object SharedVoteController {
             existingVote != null -> { // we just undo the last action
                 existingVote.isDeleted = true // remove the vote
                 voteRepository.save(existingVote)
-                if (existingVote.valueWhenVoted != votableEntity.votes) updateStatusVotes(!existingVote.direction, votableEntity, repository)
+                if (existingVote.valueWhenVoted != votableEntity.votes) updateStatusVotes(!existingVote.direction, votableEntity, userRepository, repository)
                 else response(StatusesController.VOTE_REMOVED, true)
             }
             else -> {
@@ -96,7 +99,8 @@ object SharedVoteController {
     // TODO: Use vote on entity internally
     fun <T: Votable, V: MongoRepository<StatusVote, UserEntityID>> vote(voteRepository: V,
                                                                         repository: MongoRepository<T, String>,
-                                                                        vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
+                                                                        vote: StatusVote,
+                                                                        userRepository: UserRepository): ResponseEntity<StatusResponseEntity<Boolean>> {
         val entity = repository.findByIdOrNull(vote.id.entityId)
                 ?: return response(StatusesController.STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
         val existingVote = voteRepository.findById(vote.id).orElse(null)
@@ -107,23 +111,36 @@ object SharedVoteController {
                         response(StatusesController.VOTE_TWICE_SHOULD_NOT_HAPPEN, null, false, HttpStatus.FORBIDDEN)
                     }
                     else -> { // UPDATE!! Direction is not the same!
-                        existingVote.direction = vote.direction
-                        voteRepository.save(existingVote)
-                        updateStatusVotes(vote.direction, entity, repository)
+                            existingVote.direction = vote.direction
+                            voteRepository.save(existingVote)
+                            updateStatusVotes(vote.direction, entity, userRepository, repository)
+                            // TODO: log this so that we can find out when a user does not exist this should never happen
                     }
                 }
             } // New Vote
             else -> {
                 vote.valueWhenVoted = entity.votes
                 voteRepository.save(vote)
-                return updateStatusVotes(vote.direction, entity, repository)
+                return updateStatusVotes(vote.direction, entity,userRepository, repository)
             }
         }
     }
 
-    private fun <T: Votable> updateStatusVotes(direction: Boolean, status: T, repository: MongoRepository<T, String>): ResponseEntity<StatusResponseEntity<Boolean>> {
-        if (direction) status.votes += 1 else status.votes -= 1
+    private fun <T: Votable> updateStatusVotes(direction: Boolean,
+                                               status: T,
+                                               userRepository: UserRepository,
+                                               repository: MongoRepository<T, String>): ResponseEntity<StatusResponseEntity<Boolean>> {
+        val value = if (direction) 1 else -1
+        status.votes += value
+        updateUser(status, userRepository, value) // TODO: might wanna catch the response
         repository.save(status)
         return response(StatusesController.VOTED.format(if (direction) "up" else "down"), true)
+    }
+
+    private fun updateUser(entity: Votable, userRepository: UserRepository, value: Int ): Boolean? {
+        val user =  userRepository.findByIdOrNull(entity.user.id) ?: return null // TODO log when we return null!!!
+        user.point.setScoreBadges(value)
+        entity.user = userRepository.save(user)
+        return true
     }
 }

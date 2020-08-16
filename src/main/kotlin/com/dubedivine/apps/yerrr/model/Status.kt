@@ -12,7 +12,7 @@ import kotlin.collections.ArrayList
 @Document
 data class Status(
         val body: String = "",
-        var user: User = User("1000", "Booty", "@bootynizer", "0891231234", null, emptyList(), null),
+        override var user: User,
         @Id
         var id: String? = null,
         @JsonIgnore
