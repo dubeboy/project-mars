@@ -36,12 +36,7 @@ class UsersController(private val userRepository: UserRepository,
                 response(USER_EXISTS_MESSAGE, userRepository.findByPhoneNumber(user.phoneNumber))
             }
             else -> {
-                // we inform the client that they need to create a new user
-//                return if (isValidPhoneNumber(user.phoneNumber)) {
-                    response(USER_REGISTRATION_SUCCESSFUL, userRepository.save(user))
-//                } else {
-
-//                }
+                response(USER_REGISTRATION_SUCCESSFUL, userRepository.save(user))
             }
         }
     }
