@@ -81,3 +81,8 @@ Content-Type: application/json
   }
 }
 
+### --- USERS --
+
+GET {{host}}/users/statuses?user_id=1000
+
+

@@ -9,4 +9,7 @@ interface StatusRepository: MongoRepository<Status, String> {
 
     @Query("{'comments._id': ?1, '_id': ?0 }, {'comments.\$': 1}")
     fun findByStatusIdAndCommentId(statusId: String,  commentId: String): Status? // SO that we can like a comment
+
+    @Query("{'user._id': ?0 }")
+    fun findByUserId(userId: String): List<Status>?
 }
