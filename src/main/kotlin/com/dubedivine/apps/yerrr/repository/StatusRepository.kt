@@ -1,9 +1,13 @@
 package com.dubedivine.apps.yerrr.repository
 
-import com.dubedivine.apps.yerrr.model.Comment
 import com.dubedivine.apps.yerrr.model.Status
+import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
+import org.springframework.data.domain.Example
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
+import java.util.*
 
 interface StatusRepository: MongoRepository<Status, String> {
 
@@ -12,4 +16,21 @@ interface StatusRepository: MongoRepository<Status, String> {
 
     @Query("{'user._id': ?0 }")
     fun findByUserId(userId: String): List<Status>?
+
+    @Query("{'_id': ?0 }, {'comments': { \$slice: [?1, $PAGE_SIZE] }}" )
+    fun findByIdAndPageComments(id: String, offset: Int): Status?
+
+    /**
+     * Eliminate all the comments for a fater query we hope!!!
+    * */
+
+    // WORK around to eliminate comments from find by id
+    @Query("{ '_id': ?0 }, {'comments': { \$slice: 0 }}" ) // TODO: nooob!!!!!
+    fun findByIdd(id: String): Status?
+
+    @Query("{ }, {'comments': { \$slice: 0 }}" )
+    override fun findAll(pageable: Pageable): Page<Status>
+
 }
+
+fun StatusRepository.findByIdOrNull(id: String): Status? = findByIdd(id)

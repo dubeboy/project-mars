@@ -8,13 +8,13 @@ import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.StatusCommentVoteRepository
 import com.dubedivine.apps.yerrr.repository.StatusRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.response
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.isEqualTo
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -26,14 +26,14 @@ class CommentsController(private val userRepository: UserRepository,
                          private val mongoTemplate: MongoTemplate) {
 
     @GetMapping
-    fun getComments(@PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<List<Comment>>> {
-        val status = repository.findByIdOrNull(statusId) ?: return response(StatusesController.STATUS_NOT_FOUND, null, false)
+    fun getComments(@PathVariable("status_id") statusId: String, @RequestParam("page") page: Int? = 0): ResponseEntity<StatusResponseEntity<List<Comment>>> { // TODO: boxing and unboxing of values fro primitves
+        val status = repository.findByIdAndPageComments(statusId, page ?: 0) ?: return response(StatusesController.STATUS_NOT_FOUND, null, false)
         return response("", status.comments) // TODO: should use criteria to page response
     }
 
     @PostMapping
     fun comment(@RequestBody comment: Comment, @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<String>> {
-        val status = repository.findByIdOrNull(statusId) ?: return response(StatusesController.STATUS_NOT_FOUND, null, false)
+        val status = repository.findByIdOrNull(statusId) ?: return response(StatusesController.STATUS_NOT_FOUND, null, false)  // TODO: SLICE Children to 0,0 so that there are no children!
         status.comments.add(comment)
         repository.save(status)
         return response("", comment.id)
@@ -43,7 +43,7 @@ class CommentsController(private val userRepository: UserRepository,
     fun voteOnComment(@RequestBody vote: CommentVote,
                       @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Boolean>> {
         val status = getComment(vote.id.entityId, statusId)
-        val comment = status?.comments?.firstOrNull()
+        val comment = status?.comments?.firstOrNull() // TODO: dhoes this update or replace
         when {
             comment != null -> {
                 val entity = SharedVoteController.voteOnEntity(voteRepository, comment, vote)

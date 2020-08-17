@@ -15,7 +15,7 @@ data class Status(
         override var user: User,
         @Id
         var id: String? = null,
-        @JsonIgnore
+//        @JsonIgnore
         var comments: ArrayList<Comment> = java.util.ArrayList(),
         @JsonIgnore
         var isDeleted: Boolean = false,

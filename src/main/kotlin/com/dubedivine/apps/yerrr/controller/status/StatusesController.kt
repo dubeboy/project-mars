@@ -7,12 +7,14 @@ import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.StatusRepository
 import com.dubedivine.apps.yerrr.repository.StatusVoteRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.KUtils
+import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
 import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.createdResponse
 import com.dubedivine.apps.yerrr.utils.response
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.gridfs.GridFsOperations
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -27,9 +29,11 @@ class StatusesController(private val userRepository: UserRepository,
                          private val gridFSOperations: GridFsOperations) {
 
     @GetMapping
-    fun all(): Response<List<Status>> {
+    fun all(@RequestParam page: Int? = 0): Response<List<Status>> {
         // TODO: Order by geolocation and filter by not deleted
-        return response("", repository.findAll())
+        val pageable = PageRequest.of(page ?: 0, PAGE_SIZE)
+        val statuses = repository.findAll(pageable).content
+        return response("", statuses)
     }
 
     // TODO: maybe create a handshake JWT everytime a user is posting to verify device, we could use FCM
@@ -44,7 +48,9 @@ class StatusesController(private val userRepository: UserRepository,
         return createdResponse(STATUS_POSTED, insertedStatus)
     }
 
-    // should return a Pair rather
+    /**
+     * does not return the comments of the status
+    * */
     @GetMapping("{status_id}")
     fun getStatus(@PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Status>> {
         val status = repository.findByIdOrNull(statusId)

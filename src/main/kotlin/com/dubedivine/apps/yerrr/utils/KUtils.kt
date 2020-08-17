@@ -40,6 +40,9 @@ fun <T> createdResponse(message: String, entity: T?): ResponseEntity<StatusRespo
 // ----
 
 object KUtils {
+
+    const val PAGE_SIZE = 20
+
     fun correctPhoneNumberLength(phoneNumber: PhoneNumber): Int =
         (phoneNumber.code?.countryCode?.length ?: 0) + phoneNumber.number.length
 
