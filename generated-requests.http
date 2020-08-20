@@ -3,7 +3,7 @@
 GET http://localhost:8080/statuses
 
 ### Request a single Status, with paging
-GET localhost:8080/statuses?page=0
+GET localhost:8080/statuses?page=210
 
 ### Request a single Status
 GET localhost:8080/statuses/{{status_id}}
@@ -53,7 +53,7 @@ POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comments
 Content-Type: application/json
 
 {
-  "body": "3 is a 3 xxxdfvfgfgfgfgfg gfgfgfgfgfgfgfgfgfggfgfgfgf3"
+  "body": "dfddfdfdfdfdfddfdfd3xcxcxcxcxcxccccccdsdsdsdsdsdssdsdsdsdsdsx"
 }
 
 ### get comments

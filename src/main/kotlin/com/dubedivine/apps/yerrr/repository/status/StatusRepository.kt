@@ -1,5 +1,6 @@
 package com.dubedivine.apps.yerrr.repository.status
 
+import com.dubedivine.apps.yerrr.model.Comment
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
 import org.springframework.data.domain.Page

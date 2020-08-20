@@ -8,12 +8,12 @@ import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.status.StatusCommentVoteRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
-import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.response
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -33,17 +33,26 @@ class CommentsController(private val userRepository: UserRepository,
 
     @PostMapping
     fun comment(@RequestBody comment: Comment, @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<String>> {
-        val status = repository.findByIdOrNull(statusId) ?: return response(StatusesController.STATUS_NOT_FOUND, null, false)  // TODO: SLICE Children to 0,0 so that there are no children!
-        status.comments.add(comment)
-        repository.save(status)
-        return response("", comment.id)
+       // TODO: Add the sorting to order the comments to our liking
+        val writeResult = mongoTemplate.updateFirst(
+                Query(
+                        where("_id").isEqualTo(ObjectId(statusId))
+                ),
+                Update().push("comments", comment), Status::class.java
+        )
+        return if (writeResult.wasAcknowledged())
+            response("", comment.id)
+        else
+            response(StatusesController.STATUS_NOT_FOUND, null, false)
+
     }
 
     @PostMapping("vote")
     fun voteOnComment(@RequestBody vote: CommentVote,
                       @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Boolean>> {
         val status = getComment(vote.id.entityId, statusId)
-        val comment = status?.comments?.firstOrNull() // TODO: dhoes this update or replace
+
+        val comment = status?.comments?.firstOrNull() // TODO: dhoes this update or replace, IT does not adhere to it, will need to use mongo repository
         when {
             comment != null -> {
                 val entity = SharedVoteController.voteOnEntity(voteRepository, comment, vote)
