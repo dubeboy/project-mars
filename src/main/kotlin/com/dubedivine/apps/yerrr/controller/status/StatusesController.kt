@@ -4,10 +4,10 @@ import com.dubedivine.apps.yerrr.controller.shared.SharedVoteController
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
-import com.dubedivine.apps.yerrr.repository.StatusRepository
-import com.dubedivine.apps.yerrr.repository.StatusVoteRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusVoteRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
-import com.dubedivine.apps.yerrr.repository.findByIdOrNull
+import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
 import com.dubedivine.apps.yerrr.utils.Response

@@ -2,6 +2,9 @@
 ### request all states
 GET http://localhost:8080/statuses
 
+### Request a single Status, with paging
+GET localhost:8080/statuses?page=0
+
 ### Request a single Status
 GET localhost:8080/statuses/{{status_id}}
 
@@ -50,14 +53,18 @@ POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comments
 Content-Type: application/json
 
 {
-  "body": "gg hhhhhhhh vfdgfdgfdggdfgdfgdfgfdg"
+  "body": "3 is a 3 xxxdfvfgfgfgfgfg gfgfgfgfgfgfgfgfgfggfgfgfgf3"
 }
 
 ### get comments
 GET {{host}}/statuses/5f309adb3dd75b62ddacf344/comments
 Content-Type: application/json
 
-### --- Vote on comments ---- DOES NOt work!!!
+### get comments with paging
+GET {{host}}/statuses/5f309adb3dd75b62ddacf344/comments?page=20
+Content-Type: application/json
+
+### --- Vote on comments ---- does not work!!!
 
 POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comments/vote
 Content-Type: application/json

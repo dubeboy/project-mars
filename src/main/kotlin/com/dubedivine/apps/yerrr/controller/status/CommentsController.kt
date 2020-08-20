@@ -5,10 +5,10 @@ import com.dubedivine.apps.yerrr.model.Comment
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.CommentVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
-import com.dubedivine.apps.yerrr.repository.StatusCommentVoteRepository
-import com.dubedivine.apps.yerrr.repository.StatusRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusCommentVoteRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
-import com.dubedivine.apps.yerrr.repository.findByIdOrNull
+import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.response
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -26,7 +26,7 @@ class CommentsController(private val userRepository: UserRepository,
                          private val mongoTemplate: MongoTemplate) {
 
     @GetMapping
-    fun getComments(@PathVariable("status_id") statusId: String, @RequestParam("page") page: Int? = 0): ResponseEntity<StatusResponseEntity<List<Comment>>> { // TODO: boxing and unboxing of values fro primitves
+    fun getComments(@PathVariable("status_id") statusId: String, @RequestParam("page") page: Int? = 0): ResponseEntity<StatusResponseEntity<List<Comment>>> { // TODO: boxing and unboxing of values fro primitives
         val status = repository.findByIdAndPageComments(statusId, page ?: 0) ?: return response(StatusesController.STATUS_NOT_FOUND, null, false)
         return response("", status.comments) // TODO: should use criteria to page response
     }
@@ -90,6 +90,8 @@ class CommentsController(private val userRepository: UserRepository,
             }
         }
     }
+
+
 
     private fun getComment(commentId: String, statusId: String): Status? {
         val query = Query()

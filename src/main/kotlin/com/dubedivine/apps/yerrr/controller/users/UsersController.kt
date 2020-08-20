@@ -5,9 +5,8 @@ import com.dubedivine.apps.yerrr.model.PhoneNumber
 import com.dubedivine.apps.yerrr.model.Status
 import org.springframework.web.bind.annotation.*
 import com.dubedivine.apps.yerrr.model.User
-import com.dubedivine.apps.yerrr.model.UserID
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
-import com.dubedivine.apps.yerrr.repository.StatusRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.response
 import org.springframework.http.ResponseEntity
