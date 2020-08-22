@@ -3,6 +3,7 @@ package com.dubedivine.apps.yerrr.model
 import com.dubedivine.apps.yerrr.model.abstractEntity.Votable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 import kotlin.collections.ArrayList
@@ -19,9 +20,11 @@ data class Status(
         var comments: ArrayList<Comment> = java.util.ArrayList(),
         @JsonIgnore
         var isDeleted: Boolean = false,
-        val geoLocation: Double = 0.0, // TODO: use MONGO geolocation here
+        val location: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
         var media: ArrayList<Media> = ArrayList(),
         override var likes: Long = 0, // A positive integer
         override var votes: Long = 0, // negative and positive integer
-        val createdAt: Date = Date()
+        val createdAt: Date = Date(),
+        @JsonIgnore
+        val flagged: Flag = Flag()
 ): Votable
