@@ -4,9 +4,9 @@ import com.dubedivine.apps.yerrr.controller.shared.SharedVoteController
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
+import com.dubedivine.apps.yerrr.repository.UserRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusVoteRepository
-import com.dubedivine.apps.yerrr.repository.UserRepository
 import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
-
 @RestController
 @RequestMapping("statuses")
 class StatusesController(private val userRepository: UserRepository,
@@ -31,6 +30,10 @@ class StatusesController(private val userRepository: UserRepository,
     @GetMapping
     fun all(@RequestParam page: Int? = 0): Response<List<Status>> {
         // TODO: Order by geolocation and filter by not deleted
+        //for page zero we do not increase the coordinates and we increase in subsequent pages by a certain rage
+        // https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/#mongo.geospatial
+//        val circle = Circle(-73.99171, 40.738868, 0.003712240453784)
+//        val venues: List<Venue> = template.find(Query(Criteria.where("location").withinSphere(circle)), Venue::class.java)
         val pageable = PageRequest.of(page ?: 0, PAGE_SIZE)
         val statuses = repository.findAll(pageable).content
         return response("", statuses)
@@ -52,7 +55,7 @@ class StatusesController(private val userRepository: UserRepository,
      * does not return the comments of the status
     * */
     @GetMapping("{status_id}")
-    fun getStatus(@PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Status>> {
+    fun getStatus(@PathVariable("status_id") statusId: String): Response<Status> {
         val status = repository.findByIdOrNull(statusId)
         return when (status != null) {
             true -> {

@@ -53,7 +53,7 @@ POST {{host}}/statuses/5f309adb3dd75b62ddacf344/comments
 Content-Type: application/json
 
 {
-  "body": "dfddfdfdfdfdfddfdfd3xcxcxcxcxcxccccccdsdsdsdsdsdssdsdsdsdsdsx"
+  "body": "Some inbe withe new baby "
 }
 
 ### get comments

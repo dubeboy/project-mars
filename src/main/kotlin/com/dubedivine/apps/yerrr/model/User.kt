@@ -16,7 +16,7 @@ data class User(
         val handle: String, // Might serve as a handle @something_spicy
         @Indexed(unique = true)
         val phoneNumber: String, // might want to have this be a computed variable of PhoneNumber
-        val profile: Media?,
+        val profilePicture: Media?,
         val point: Point = Point(),
         @JsonIgnore
         var fcmToken: String? = null

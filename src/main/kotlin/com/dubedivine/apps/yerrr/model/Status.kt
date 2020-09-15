@@ -8,23 +8,24 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 import kotlin.collections.ArrayList
 
-// TODO: add a report flag to this later
-
 @Document
 data class Status(
         val body: String = "",
         override var user: User,
         @Id
         var id: String? = null,
-//        @JsonIgnore
+        @JsonIgnore
         var comments: ArrayList<Comment> = java.util.ArrayList(),
         @JsonIgnore
         var isDeleted: Boolean = false,
-        val location: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
+        val location: Location = Location(0.0, 0.0),
         var media: ArrayList<Media> = ArrayList(),
         override var likes: Long = 0, // A positive integer
         override var votes: Long = 0, // negative and positive integer
         val createdAt: Date = Date(),
         @JsonIgnore
         val flagged: Flag = Flag()
-): Votable
+): Votable {
+        @JsonIgnore
+        var geoLocation: GeoJsonPoint = GeoJsonPoint(location.x, location.y)
+}

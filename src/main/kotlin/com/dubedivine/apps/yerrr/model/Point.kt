@@ -14,11 +14,11 @@ enum class Badges(val string: String) {
 @Document
 data class Point(
         var score: Int = 0,
-        var badges: String = Badges.STRANGER.string
+        var badge: String = Badges.STRANGER.string
 ) {
 
     fun setScoreBadges(value: Int) {
-        badges = level(value).string
+        badge = level(value).string
         score += value
     }
 

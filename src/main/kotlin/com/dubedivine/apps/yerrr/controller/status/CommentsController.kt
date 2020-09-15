@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("statuses/{status_id}/comments")
@@ -34,6 +35,7 @@ class CommentsController(private val userRepository: UserRepository,
     @PostMapping
     fun comment(@RequestBody comment: Comment, @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<String>> {
        // TODO: Add the sorting to order the comments to our liking
+        comment.sanitizeModel()
         val writeResult = mongoTemplate.updateFirst(
                 Query(
                         where("_id").isEqualTo(ObjectId(statusId))
