@@ -1,5 +1,6 @@
-package com.dubedivine.apps.yerrr.model
+package com.dubedivine.apps.yerrr.model.requestObject
 
+import com.dubedivine.apps.yerrr.model.UserEntityID
 import com.dubedivine.apps.yerrr.model.abstractEntity.Vote
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
@@ -11,7 +12,8 @@ typealias EntityID = String
 
 // isDeleted is important because want to be able to see how undecided people are
 @Document
-data class StatusVote(@Id @Indexed(unique = true) override var id: UserEntityID,
+data class StatusVote(@Id @Indexed(unique = true)
+                      override var id: UserEntityID,
                       override var direction: Boolean,
                       @JsonIgnore override var isDeleted: Boolean = false): Vote {
     override var valueWhenVoted: Long = 0

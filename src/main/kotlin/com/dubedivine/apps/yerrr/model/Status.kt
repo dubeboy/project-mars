@@ -22,10 +22,20 @@ data class Status(
         var media: ArrayList<Media> = ArrayList(),
         override var likes: Long = 0, // A positive integer
         override var votes: Long = 0, // negative and positive integer
-        val createdAt: Date = Date(),
+        var createdAt: Date = Date(),
         @JsonIgnore
-        val flagged: Flag = Flag()
+        var flagged: Flag = Flag()
 ): Votable {
         @JsonIgnore
         var geoLocation: GeoJsonPoint = GeoJsonPoint(location.x, location.y)
+
+        fun sanitizeStatus() {
+                id = null
+                comments = ArrayList()
+                isDeleted = false
+                likes = 0
+                votes = 0
+                createdAt = Date()
+                flagged = Flag()
+        }
 }

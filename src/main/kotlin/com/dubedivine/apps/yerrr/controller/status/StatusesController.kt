@@ -2,9 +2,11 @@ package com.dubedivine.apps.yerrr.controller.status
 
 import com.dubedivine.apps.yerrr.controller.shared.SharedVoteController
 import com.dubedivine.apps.yerrr.model.Status
-import com.dubedivine.apps.yerrr.model.StatusVote
+import com.dubedivine.apps.yerrr.model.requestObject.StatusLike
+import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusLikeRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusVoteRepository
 import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile
 class StatusesController(private val userRepository: UserRepository,
                          private val repository: StatusRepository,
                          private val voteRepository: StatusVoteRepository,
+                         private val likeRepository: StatusLikeRepository,
                          private val gridFSOperations: GridFsOperations) {
 
     @GetMapping
@@ -47,6 +50,7 @@ class StatusesController(private val userRepository: UserRepository,
 //                ?: return badRequestResponse("Something went wrong, please try logging in again", null)
 //        status.user = user
         // prevent usets from posting the same status
+        status.sanitizeStatus()
         val insertedStatus = repository.insert(status)
         return createdResponse(STATUS_POSTED, insertedStatus)
     }
@@ -67,8 +71,6 @@ class StatusesController(private val userRepository: UserRepository,
         }
     }
 
-    // TODO: could actually move this to its own controller
-
     @PostMapping("vote")
     fun vote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
         return SharedVoteController.vote(voteRepository, repository, vote, userRepository)
@@ -77,6 +79,11 @@ class StatusesController(private val userRepository: UserRepository,
     @PostMapping("vote/delete")
     fun removeVote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
         return SharedVoteController.removeVote(voteRepository, repository, vote, userRepository)
+    }
+
+    @PostMapping("like")
+    fun like(@RequestBody vote: StatusLike): ResponseEntity<StatusResponseEntity<Boolean>> {
+        return SharedVoteController.vote(likeRepository, repository, vote, userRepository)
     }
 
     private fun createHandle(handle: String): String {
@@ -100,6 +107,7 @@ class StatusesController(private val userRepository: UserRepository,
                 val media = KUtils.createMedia(files, gridFSOperations)
                 // status.media.addAll(media)
                 status.media = media
+                repository.save(status)
                 response(MEDIA_SAVED, repository.save(status))
             }
         }

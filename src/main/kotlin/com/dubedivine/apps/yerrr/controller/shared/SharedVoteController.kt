@@ -2,8 +2,9 @@ package com.dubedivine.apps.yerrr.controller.shared
 
 import com.dubedivine.apps.yerrr.controller.status.StatusesController
 import com.dubedivine.apps.yerrr.model.UserEntityID
-import com.dubedivine.apps.yerrr.model.StatusVote
 import com.dubedivine.apps.yerrr.model.abstractEntity.Votable
+import com.dubedivine.apps.yerrr.model.abstractEntity.Vote
+import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.UserRepository
 import com.dubedivine.apps.yerrr.utils.response
@@ -97,9 +98,9 @@ object SharedVoteController {
     }
 
     // TODO: Use vote on entity internally
-    fun <T: Votable, V: MongoRepository<StatusVote, UserEntityID>> vote(voteRepository: V,
+    fun <T: Votable, E: Vote , V: MongoRepository<E, UserEntityID>> vote(voteRepository: V,
                                                                         repository: MongoRepository<T, String>,
-                                                                        vote: StatusVote,
+                                                                        vote: E,
                                                                         userRepository: UserRepository): ResponseEntity<StatusResponseEntity<Boolean>> {
         val entity = repository.findByIdOrNull(vote.id.entityId)
                 ?: return response(StatusesController.STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)

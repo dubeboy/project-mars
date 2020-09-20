@@ -1,5 +1,6 @@
-package com.dubedivine.apps.yerrr.model
+package com.dubedivine.apps.yerrr.model.requestObject
 
+import com.dubedivine.apps.yerrr.model.UserEntityID
 import com.dubedivine.apps.yerrr.model.abstractEntity.Vote
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
