@@ -1,6 +1,7 @@
 package com.dubedivine.apps.yerrr.controller.status
 
 import com.dubedivine.apps.yerrr.controller.shared.SharedVoteController
+import com.dubedivine.apps.yerrr.controller.users.UsersController
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.requestObject.StatusLike
 import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
@@ -15,8 +16,15 @@ import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
 import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.createdResponse
 import com.dubedivine.apps.yerrr.utils.response
+import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.gridfs.GridFsOperations
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -28,6 +36,7 @@ class StatusesController(private val userRepository: UserRepository,
                          private val repository: StatusRepository,
                          private val voteRepository: StatusVoteRepository,
                          private val likeRepository: StatusLikeRepository,
+                         private val mongoTemplate: MongoTemplate,
                          private val gridFSOperations: GridFsOperations) {
 
     @GetMapping
@@ -57,7 +66,7 @@ class StatusesController(private val userRepository: UserRepository,
 
     /**
      * does not return the comments of the status
-    * */
+     * */
     @GetMapping("{status_id}")
     fun getStatus(@PathVariable("status_id") statusId: String): Response<Status> {
         val status = repository.findByIdOrNull(statusId)
@@ -82,8 +91,30 @@ class StatusesController(private val userRepository: UserRepository,
     }
 
     @PostMapping("like")
-    fun like(@RequestBody vote: StatusLike): ResponseEntity<StatusResponseEntity<Boolean>> {
-        return SharedVoteController.vote(likeRepository, repository, vote, userRepository)
+    fun like(@RequestBody statusLike: StatusLike): ResponseEntity<StatusResponseEntity<Boolean>> {
+        val status = repository.findByIdOrNull(statusLike.id.entityId)
+        val user = userRepository.findByIdOrNull(statusLike.id.userId)
+        return when (user == null || status == null) {
+            true -> {
+                // TODO: log errors like this here
+                response("$STATUS_NOT_FOUND or ${UsersController.USER_NOT_FOUND}", null, false)
+            }
+            else -> {
+                statusLike.valueWhenVoted += 1
+                return if (statusLike.valueWhenVoted > 50) {
+                    response(LIKE_STATUS_CANNOT_BE_MORE_THAN_FIFTY, false)
+                } else {
+                    statusLike.sanitize()
+                    likeRepository.save(statusLike)
+                    mongoTemplate.findAndModify(
+                            Query.query(Criteria.where("_id").isEqualTo(ObjectId(statusLike.id.entityId))),
+                            Update().inc("likes", 1),
+                            Status::class.java
+                    )
+                    response(LIKE_STATUS, true)
+                }
+            }
+        }
     }
 
     private fun createHandle(handle: String): String {
@@ -120,6 +151,8 @@ class StatusesController(private val userRepository: UserRepository,
         const val STATUS_NOT_FOUND = "Sorry, could not find that Status."
         const val COMMENT_NOT_FOUND = "Sorry could not find this comment"
         const val VOTE_TWICE_SHOULD_NOT_HAPPEN = "Vote twice should not happen"
+        const val LIKE_STATUS = "+1"
+        const val LIKE_STATUS_CANNOT_BE_MORE_THAN_FIFTY = "You cannot like the same status more than 50 times."
         const val VOTE_YOU_HAVE_NOT_VOTED_YET = "You have not voted on this Status therefore we cannot remove it"
         const val VOTE_REMOVED = "Vote removed"
         const val VOTED = "%s voted."

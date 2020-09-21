@@ -3,7 +3,7 @@
 GET http://localhost:8080/statuses
 
 ### Request a single Status, with paging
-GET localhost:8080/statuses?page=210
+GET localhost:8080/statuses?page=0
 
 ### Request a single Status
 GET localhost:8080/statuses/{{status_id}}

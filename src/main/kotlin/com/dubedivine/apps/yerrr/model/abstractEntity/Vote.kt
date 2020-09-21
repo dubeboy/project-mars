@@ -7,4 +7,9 @@ interface Vote {
     var direction: Boolean
     var isDeleted: Boolean
     var valueWhenVoted: Long
+
+    fun sanitize() {
+        isDeleted = false
+        valueWhenVoted = 0
+    }
 }
