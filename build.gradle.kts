@@ -7,7 +7,7 @@ plugins {
 	kotlin("plugin.spring") version "1.3.72"
 }
 
-apply(plugin = "io.spring.dependency-management")
+//apply(plugin = "io.spring.dependency-management")
 
 group = "com.dubedivine.apps"
 version = "0.0.1-SNAPSHOT"

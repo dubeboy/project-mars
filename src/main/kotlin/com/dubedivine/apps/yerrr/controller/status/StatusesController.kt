@@ -7,9 +7,7 @@ import com.dubedivine.apps.yerrr.model.requestObject.StatusLike
 import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.UserRepository
-import com.dubedivine.apps.yerrr.repository.status.StatusLikeRepository
-import com.dubedivine.apps.yerrr.repository.status.StatusRepository
-import com.dubedivine.apps.yerrr.repository.status.StatusVoteRepository
+import com.dubedivine.apps.yerrr.repository.status.*
 import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
@@ -37,6 +35,7 @@ class StatusesController(private val userRepository: UserRepository,
                          private val voteRepository: StatusVoteRepository,
                          private val likeRepository: StatusLikeRepository,
                          private val mongoTemplate: MongoTemplate,
+                         private val statusLikeRepository: StatusLikeRepositoryImplementation,
                          private val gridFSOperations: GridFsOperations) {
 
     @GetMapping
@@ -100,12 +99,19 @@ class StatusesController(private val userRepository: UserRepository,
                 response("$STATUS_NOT_FOUND or ${UsersController.USER_NOT_FOUND}", null, false)
             }
             else -> {
-                statusLike.valueWhenVoted += 1
-                return if (statusLike.valueWhenVoted > 50) {
+                val like = likeRepository.findByIdOrNull(statusLike.id)
+
+                return if (like != null && like.valueWhenVoted > 50) {
                     response(LIKE_STATUS_CANNOT_BE_MORE_THAN_FIFTY, false)
                 } else {
-                    statusLike.sanitize()
-                    likeRepository.save(statusLike)
+//                    statusLike.isDeleted = false
+                   if (like == null) {
+                       statusLike.isDeleted = false
+                       statusLike.valueWhenVoted += 1
+                       likeRepository.save(statusLike)
+                   } else {
+                       statusLikeRepository.inc(statusLike)
+                   }
                     mongoTemplate.findAndModify(
                             Query.query(Criteria.where("_id").isEqualTo(ObjectId(statusLike.id.entityId))),
                             Update().inc("likes", 1),

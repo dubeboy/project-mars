@@ -5,6 +5,7 @@ import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.User
 import com.dubedivine.apps.yerrr.repository.status.StatusVoteRepository
 import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusLikeRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsOperations
@@ -18,6 +19,7 @@ class DBHelper(private val repository: StatusRepository,
                private val voteRepository: StatusVoteRepository,
                private val statusCommentRepository: StatusVoteRepository,
                private val gridFsOperations: GridFsOperations,
+               private val likeRepostory: StatusLikeRepository,
                private val userRepository: UserRepository): CommandLineRunner {
     override fun run(vararg args: String?) {
         println("💣 Deleting everything....")
@@ -26,6 +28,7 @@ class DBHelper(private val repository: StatusRepository,
         gridFsOperations.delete(Query())
         voteRepository.deleteAll()
         userRepository.deleteAll()
+        likeRepostory.deleteAll()
         println("💣 Done \uD83D\uDCA3")
 
         val user = userRepository.save(User("1000", "Booty", "@bootynizer", "0891231234", null))
