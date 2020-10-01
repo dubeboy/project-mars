@@ -1,6 +1,6 @@
 package com.dubedivine.apps.yerrr.controller.users
 
-import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.user.UserRepository
 import com.dubedivine.apps.yerrr.model.PhoneNumber
 import com.dubedivine.apps.yerrr.model.Status
 import org.springframework.web.bind.annotation.*
@@ -72,7 +72,7 @@ class UsersController(private val userRepository: UserRepository,
         const val USER_EXISTS_MESSAGE = "Signing you in..."
         const val USER_REGISTRATION_SUCCESSFUL = "Successfully registered"
         const val USER_DOES_NOT_EXIST = "Please create a new user"
-        const val USER_NOT_FOUND = "Use not found"
+        const val USER_NOT_FOUND = "User not found"
 
     }
 

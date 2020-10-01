@@ -6,7 +6,7 @@ import com.dubedivine.apps.yerrr.model.abstractEntity.Votable
 import com.dubedivine.apps.yerrr.model.abstractEntity.Vote
 import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
-import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.user.UserRepository
 import com.dubedivine.apps.yerrr.utils.response
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.repository.findByIdOrNull

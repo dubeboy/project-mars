@@ -4,7 +4,7 @@ import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.User
 import com.dubedivine.apps.yerrr.repository.status.StatusVoteRepository
-import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.user.UserRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusLikeRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.data.mongodb.core.query.Query

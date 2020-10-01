@@ -6,7 +6,7 @@ import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.requestObject.StatusLike
 import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
-import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.user.UserRepository
 import com.dubedivine.apps.yerrr.repository.status.*
 import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
 import com.dubedivine.apps.yerrr.utils.KUtils

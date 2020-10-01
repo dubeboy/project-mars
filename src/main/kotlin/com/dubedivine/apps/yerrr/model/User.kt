@@ -19,7 +19,7 @@ data class User(
         val profilePicture: Media?,
         val point: Point = Point(),
         @JsonIgnore
-        var fcmToken: String? = null
+        var fcmToken: String? = null // I do this this is required
 )
 
 enum class CountryCode(val countryCode: String) {

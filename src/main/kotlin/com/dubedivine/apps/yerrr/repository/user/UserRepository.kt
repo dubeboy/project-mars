@@ -1,4 +1,4 @@
-package com.dubedivine.apps.yerrr.repository
+package com.dubedivine.apps.yerrr.repository.user
 
 import com.dubedivine.apps.yerrr.model.User
 import org.springframework.data.mongodb.repository.MongoRepository

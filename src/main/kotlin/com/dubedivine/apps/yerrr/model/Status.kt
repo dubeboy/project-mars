@@ -12,19 +12,15 @@ import kotlin.collections.ArrayList
 data class Status(
         val body: String = "",
         override var user: User,
-        @Id
-        var id: String? = null,
-        @JsonIgnore
-        var comments: ArrayList<Comment> = java.util.ArrayList(),
-        @JsonIgnore
-        var isDeleted: Boolean = false,
+        @Id var id: String? = null,
+        @JsonIgnore var comments: ArrayList<Comment> = java.util.ArrayList(),
+        @JsonIgnore var isDeleted: Boolean = false,
         val location: Location = Location(0.0, 0.0),
         var media: ArrayList<Media> = ArrayList(),
         override var likes: Long = 0, // A positive integer
-        override var votes: Long = 0, // negative and positive integer
+        override var votes: Long = 0, // negative or positive integer
         var createdAt: Date = Date(),
-        @JsonIgnore
-        var flagged: Flag = Flag()
+        @JsonIgnore var flagged: Flag = Flag()
 ): Votable {
         @JsonIgnore
         var geoLocation: GeoJsonPoint = GeoJsonPoint(location.x, location.y)

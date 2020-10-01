@@ -7,7 +7,7 @@ import com.dubedivine.apps.yerrr.model.CommentVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.status.StatusCommentVoteRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusRepository
-import com.dubedivine.apps.yerrr.repository.UserRepository
+import com.dubedivine.apps.yerrr.repository.user.UserRepository
 import com.dubedivine.apps.yerrr.utils.response
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
