@@ -8,6 +8,7 @@ import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.status.StatusCommentVoteRepository
 import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.repository.user.UserRepository
+import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.response
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -26,13 +27,13 @@ class CommentsController(private val userRepository: UserRepository,
                          private val mongoTemplate: MongoTemplate) {
 
     @GetMapping
-    fun getComments(@PathVariable("status_id") statusId: String, @RequestParam("page") page: Int? = 0): ResponseEntity<StatusResponseEntity<List<Comment>>> { // TODO: boxing and unboxing of values fro primitives
+    fun getComments(@PathVariable("status_id") statusId: String, @RequestParam("page") page: Int? = 0): Response<List<Comment>> { // TODO: boxing and unboxing of values fro primitives
         val status = repository.findByIdAndPageComments(statusId, page ?: 0) ?: return response(StatusesController.STATUS_NOT_FOUND, null, false)
         return response("", status.comments) // TODO: should use criteria to page response
     }
 
     @PostMapping
-    fun comment(@RequestBody comment: Comment, @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<String>> {
+    fun comment(@RequestBody comment: Comment, @PathVariable("status_id") statusId: String): Response<String> {
        // TODO: Add the sorting to order the comments to our liking
         comment.sanitizeModel()
         val writeResult = mongoTemplate.updateFirst(
@@ -50,7 +51,7 @@ class CommentsController(private val userRepository: UserRepository,
 
     @PostMapping("vote")
     fun voteOnComment(@RequestBody vote: CommentVote,
-                      @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Boolean>> {
+                      @PathVariable("status_id") statusId: String): Response<Boolean> {
         val status = getComment(vote.id.entityId, statusId)
 
         val comment = status?.comments?.firstOrNull() // TODO: dhoes this update or replace, IT does not adhere to it, will need to use mongo repository
@@ -77,7 +78,7 @@ class CommentsController(private val userRepository: UserRepository,
 
     @PostMapping("vote/delete")
     fun removeVoteOnComment(@RequestBody vote: CommentVote,
-                            @PathVariable("status_id") statusId: String): ResponseEntity<StatusResponseEntity<Boolean>> {
+                            @PathVariable("status_id") statusId: String): Response<Boolean> {
         val status = getComment(vote.id.entityId, statusId)
         val comment = status?.comments?.firstOrNull()
         when {

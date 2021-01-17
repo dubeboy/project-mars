@@ -20,6 +20,7 @@ data class Status(
         override var likes: Long = 0, // A positive integer
         override var votes: Long = 0, // negative or positive integer
         var createdAt: Date = Date(),
+        var circleName: String,
         @JsonIgnore var flagged: Flag = Flag()
 ): Votable {
         @JsonIgnore

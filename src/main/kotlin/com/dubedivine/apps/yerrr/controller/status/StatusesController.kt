@@ -5,10 +5,13 @@ import com.dubedivine.apps.yerrr.controller.users.UsersController
 import com.dubedivine.apps.yerrr.model.Status
 import com.dubedivine.apps.yerrr.model.requestObject.StatusLike
 import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
-import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
-import com.dubedivine.apps.yerrr.repository.user.UserRepository
-import com.dubedivine.apps.yerrr.repository.status.*
+import com.dubedivine.apps.yerrr.repository.circle.CircleRepositoryImplementation
+import com.dubedivine.apps.yerrr.repository.status.StatusLikeRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusLikeRepositoryImplementation
+import com.dubedivine.apps.yerrr.repository.status.StatusRepository
+import com.dubedivine.apps.yerrr.repository.status.StatusVoteRepository
 import com.dubedivine.apps.yerrr.repository.status.findByIdOrNull
+import com.dubedivine.apps.yerrr.repository.user.UserRepository
 import com.dubedivine.apps.yerrr.utils.KUtils
 import com.dubedivine.apps.yerrr.utils.KUtils.PAGE_SIZE
 import com.dubedivine.apps.yerrr.utils.Response
@@ -16,6 +19,7 @@ import com.dubedivine.apps.yerrr.utils.createdResponse
 import com.dubedivine.apps.yerrr.utils.response
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -24,7 +28,6 @@ import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.gridfs.GridFsOperations
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -35,6 +38,7 @@ class StatusesController(private val userRepository: UserRepository,
                          private val voteRepository: StatusVoteRepository,
                          private val likeRepository: StatusLikeRepository,
                          private val mongoTemplate: MongoTemplate,
+                         private val circlesRepository: CircleRepositoryImplementation,
                          private val statusLikeRepository: StatusLikeRepositoryImplementation,
                          private val gridFSOperations: GridFsOperations) {
 
@@ -45,7 +49,8 @@ class StatusesController(private val userRepository: UserRepository,
         // https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/#mongo.geospatial
 //        val circle = Circle(-73.99171, 40.738868, 0.003712240453784)
 //        val venues: List<Venue> = template.find(Query(Criteria.where("location").withinSphere(circle)), Venue::class.java)
-        val pageable = PageRequest.of(page ?: 0, PAGE_SIZE)
+        val pageable = PageRequest.of(page
+                ?: 0, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"))
         val statuses = repository.findAll(pageable).content
         return response("", statuses)
     }
@@ -60,7 +65,11 @@ class StatusesController(private val userRepository: UserRepository,
         // prevent usets from posting the same status
         status.sanitizeStatus()
         val insertedStatus = repository.insert(status)
-        return createdResponse(STATUS_POSTED, insertedStatus)
+        // TODO: log when after this inserted so that we know of any things that break or data corruption
+        val addedStatus = circlesRepository.addStatus(insertedStatus)
+        // TODO: log when after this inserted
+
+        return if (addedStatus) createdResponse(STATUS_POSTED, insertedStatus) else createdResponse(STATUS_NOT_POSTED, null, false)
     }
 
     /**
@@ -80,17 +89,17 @@ class StatusesController(private val userRepository: UserRepository,
     }
 
     @PostMapping("vote")
-    fun vote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
+    fun vote(@RequestBody vote: StatusVote): Response<Boolean> {
         return SharedVoteController.vote(voteRepository, repository, vote, userRepository)
     }
 
     @PostMapping("vote/delete")
-    fun removeVote(@RequestBody vote: StatusVote): ResponseEntity<StatusResponseEntity<Boolean>> {
+    fun removeVote(@RequestBody vote: StatusVote): Response<Boolean> {
         return SharedVoteController.removeVote(voteRepository, repository, vote, userRepository)
     }
 
     @PostMapping("like")
-    fun like(@RequestBody statusLike: StatusLike): ResponseEntity<StatusResponseEntity<Boolean>> {
+    fun like(@RequestBody statusLike: StatusLike): Response<Boolean> {
         val status = repository.findByIdOrNull(statusLike.id.entityId)
         val user = userRepository.findByIdOrNull(statusLike.id.userId)
         return when (user == null || status == null) {
@@ -135,7 +144,7 @@ class StatusesController(private val userRepository: UserRepository,
 
     @PostMapping("{status_id}/files")
     fun addFiles(@PathVariable("status_id") statusId: String,
-                 @RequestPart files: List<MultipartFile>): ResponseEntity<StatusResponseEntity<Status>> {
+                 @RequestPart files: List<MultipartFile>): Response<Status> {
         return when (val status = repository.findByIdOrNull(statusId)) {
             null -> {
                 response(FILE_CANNOT_FIND_STATUS, null, false, HttpStatus.NOT_FOUND)
@@ -152,6 +161,7 @@ class StatusesController(private val userRepository: UserRepository,
 
     companion object {
         const val STATUS_POSTED = "Posted new status"
+        const val STATUS_NOT_POSTED = "Sorry could not post status"
         const val FILE_CANNOT_FIND_STATUS = "Sorry could not add files because we could not find that Status."
         const val MEDIA_SAVED = "Posted media."
         const val STATUS_NOT_FOUND = "Sorry, could not find that Status."

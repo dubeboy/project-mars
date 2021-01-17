@@ -26,11 +26,11 @@ fun <T> response(message: String, entity: T?, status: Boolean = true, httpStatus
     )
 }
 
-fun <T> createdResponse(message: String, entity: T?): ResponseEntity<StatusResponseEntity<T>> {
+fun <T> createdResponse(message: String, entity: T?, status: Boolean = true): Response<T> {
     return response(
             message,
             entity,
-            true,
+            status,
             HttpStatus.CREATED
     )
 }

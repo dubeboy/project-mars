@@ -9,3 +9,5 @@ class YerrrApplication
 fun main(args: Array<String>) {
 	runApplication<YerrrApplication>(*args)
 }
+
+// TODO:  add ControllerAdvisor to check errors etc and when adding The actuator

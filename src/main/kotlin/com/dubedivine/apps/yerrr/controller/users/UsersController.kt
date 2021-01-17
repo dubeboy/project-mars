@@ -8,6 +8,7 @@ import com.dubedivine.apps.yerrr.model.User
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.status.StatusRepository
 import com.dubedivine.apps.yerrr.utils.KUtils
+import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.response
 import org.springframework.http.ResponseEntity
 
@@ -25,10 +26,10 @@ class UsersController(private val userRepository: UserRepository,
     /**
      * This will create a new user and sign or return a status that this use does not exist
      * If the user is logging in using phone number we should not allow them to have more than one session, we should remove the other session
-     * after receiving the code: https://firebase.google.com/docs/auth/android/phone-auth
+     * after receiving the code: https://firebase.googleDB.com/docs/auth/android/phone-auth
     * */
     @PostMapping
-    fun signIn(@RequestBody user: User): ResponseEntity<StatusResponseEntity<User>> {
+    fun signIn(@RequestBody user: User): Response<User> {
         val userExists = userRepository.existsByPhoneNumber(user.phoneNumber) // should also check email later
         return when {
             userExists -> {
@@ -43,7 +44,7 @@ class UsersController(private val userRepository: UserRepository,
     // when we check if the user exists we either return a user o nothing
     // NB: this must be super light weight
     @GetMapping("user_exists")
-    fun userExists(@RequestParam("phone_number") phoneNumber: String): ResponseEntity<StatusResponseEntity<User>> {
+    fun userExists(@RequestParam("phone_number") phoneNumber: String): Response<User> {
         val userExists = userRepository.existsByPhoneNumber(phoneNumber)
         return when {
             userExists -> {
@@ -56,7 +57,7 @@ class UsersController(private val userRepository: UserRepository,
     }
 
     @GetMapping("statuses")
-    fun getUserStatuses(@RequestParam("user_id") userId: String):  ResponseEntity<StatusResponseEntity<List<Status>>> {
+    fun getUserStatuses(@RequestParam("user_id") userId: String):  Response<List<Status>> {
         val userStatuses = statusRepository.findByUserId(userId)
         return response("", userStatuses)
     }

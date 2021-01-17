@@ -7,6 +7,7 @@ import com.dubedivine.apps.yerrr.model.abstractEntity.Vote
 import com.dubedivine.apps.yerrr.model.requestObject.StatusVote
 import com.dubedivine.apps.yerrr.model.responseEntity.StatusResponseEntity
 import com.dubedivine.apps.yerrr.repository.user.UserRepository
+import com.dubedivine.apps.yerrr.utils.Response
 import com.dubedivine.apps.yerrr.utils.response
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -25,7 +26,7 @@ object SharedVoteController {
     fun <T: Votable, V: MongoRepository<StatusVote, UserEntityID>> removeVote(voteRepository: V,
                                                                               repository: MongoRepository<T, String>,
                                                                               vote: StatusVote,
-                                                                              userRepository: UserRepository): ResponseEntity<StatusResponseEntity<Boolean>> {
+                                                                              userRepository: UserRepository): Response<Boolean> {
         val votableEntity = repository.findByIdOrNull(vote.id.entityId)
                 ?: return response(StatusesController.STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
         val existingVote = voteRepository.findById(vote.id).orElse(null)
@@ -101,7 +102,7 @@ object SharedVoteController {
     fun <T: Votable, E: Vote , V: MongoRepository<E, UserEntityID>> vote(voteRepository: V,
                                                                         repository: MongoRepository<T, String>,
                                                                         vote: E,
-                                                                        userRepository: UserRepository): ResponseEntity<StatusResponseEntity<Boolean>> {
+                                                                        userRepository: UserRepository): Response<Boolean> {
         val entity = repository.findByIdOrNull(vote.id.entityId)
                 ?: return response(StatusesController.STATUS_NOT_FOUND, null, false, HttpStatus.NOT_FOUND)
         val existingVote = voteRepository.findById(vote.id).orElse(null)
@@ -130,7 +131,7 @@ object SharedVoteController {
     private fun <T: Votable> updateStatusVotes(direction: Boolean,
                                                status: T,
                                                userRepository: UserRepository,
-                                               repository: MongoRepository<T, String>): ResponseEntity<StatusResponseEntity<Boolean>> {
+                                               repository: MongoRepository<T, String>): Response<Boolean> {
         val value = if (direction) 1 else -1
         status.votes += value
         updateUser(status, userRepository, value) // TODO: might wanna catch the response

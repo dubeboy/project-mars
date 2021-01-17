@@ -14,37 +14,44 @@ enum class Badges(val string: String) {
 @Document
 data class Point(
         var score: Int = 0,
-        var badge: String = Badges.STRANGER.string
+        var badge: String = Badges.STRANGER.string,
+        var colorHex: String = hexColors[0]
 ) {
 
     fun setScoreBadges(value: Int) {
-        badge = level(value).string
+        badge = level(value).first.string
         score += value
+        colorHex =  level(value).second
     }
 
 
 
-    private fun level(level: Int): Badges {
+    private fun level(level: Int): Pair<Badges, String>  {
         return when (level) {
             in 0..100 -> {
-                Badges.STRANGER
+                Pair(Badges.STRANGER, hexColors[0])
             }
             in 100..200 -> {
-                Badges.NEW_COMER
+                Pair(Badges.NEW_COMER, hexColors[1])
             }
             in 200..400 -> {  // You stay a regular for a while 200
-                Badges.REGULAR
+                Pair(Badges.REGULAR, hexColors[2])
             }
             in 400..700 -> { // 300
-                Badges.GUIDE
+                Pair(Badges.GUIDE, hexColors[3])
             }
             in 700..1100 -> { // 400
-                Badges.EXPERT
+                Pair(Badges.EXPERT, hexColors[4])
             }
             else -> { // 900 going up
-                Badges.LEADER
+                Pair(Badges.LEADER, hexColors[5])
             }
         }
+    }
+
+
+    companion object {
+        var hexColors = arrayOf("264653","2a9d8f","e9c46a","f4a261","e76f51", "fca311")
     }
 }
 

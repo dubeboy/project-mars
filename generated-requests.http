@@ -1,6 +1,7 @@
 ### https://www.jetbrains.com/help/idea/exploring-http-syntax.html#enable-disable-redirects
 ### request all states
 GET http://localhost:8080/statuses
+Content-Type: application/json
 
 ### Request a single Status, with paging
 GET localhost:8080/statuses?page=0
@@ -106,4 +107,7 @@ Content-Type: application/json
 
 GET {{host}}/users/statuses?user_id=1000
 
+### --- Circles
 
+GET {{host}}/circles/my_circles?user_id=1000
+Content-Type: application/json
