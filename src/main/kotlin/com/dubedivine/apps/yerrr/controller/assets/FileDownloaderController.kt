@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
 
-
 @RestController
 @RequestMapping("assets") // I would like to make the request look like its just getting a static resource
 class FileDownloaderController(private val gridFsOperations: GridFsOperations) {
@@ -25,7 +24,8 @@ class FileDownloaderController(private val gridFsOperations: GridFsOperations) {
     fun getFile(@PathVariable id: String): ResponseEntity<ByteArrayResource> {
         try {
             println("the Id id $id")
-            val gridFSFile = gridFsOperations.findOne(query(where("_id").isEqualTo(ObjectId(id))))
+            val cleanId = id.removeSuffix(".mp4")
+            val gridFSFile = gridFsOperations.findOne(query(where("_id").isEqualTo(ObjectId(cleanId))))
 
             if (gridFSFile?.length != null && gridFSFile.length != 0L) {
 
@@ -54,6 +54,7 @@ class FileDownloaderController(private val gridFsOperations: GridFsOperations) {
             return ResponseEntity(HttpStatus.NO_CONTENT)
         }
     }
+
     @Throws(IOException::class)
     fun getBytes(inputStream: InputStream): ByteArray {
         var buf = ByteArray(1024)
